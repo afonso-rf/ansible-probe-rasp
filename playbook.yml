@@ -1,0 +1,37 @@
+---
+- name: Playbook for adding nanagement vlan and pppoe connection to probe Raspberry PI
+  hosts: probe
+  become: yes
+
+  vars:
+    - mgnt_vlan: ''
+    - packages: ['git', 'ppp', 'vlan', 'pppoeconf', zabbix-agent]
+    
+  tasks:
+  - name: Packages update
+    ansible.builtin.apt:
+      update_cache: yes
+
+  - name: Installing packages
+    ansible.builtin.package:
+      name: "{{ item }}"
+      state: latest
+    with_items: "{{ packages }}"
+  
+  - name: Add the 802.1q module
+    modprobe:
+      name: 8021q
+      state: present
+
+  - name: Copy script to ipv6 pppoe default route
+    ansible.builtin.copy:
+      src: ./src/defaultroute_ipv6
+      dest: /etc/ppp/ip-up.d/
+      mode: '755'
+  
+  - name: Copy vlan config file
+    ansible.builtin.copy:
+      src: "{{ mgnt_vlan }}"
+      dest: "/etc/network/interfaces.d/{{ mngt_vlan }}"
+      mode: '644'
+    when: mgnt_vlan is defined and mgnt_vlan != ''
