@@ -1,0 +1,13 @@
+# /etc/network/interface.d/vlan{{ mngt.vlan }} 
+
+auto vlan{{ mngt.vlan }}
+  iface vlan{{ mngt.vlan }} inet static
+  address {{ mngt.ip }}
+  vlan-raw-device eth0
+
+  post-up route add {{ mngt.gtw }} dev vlan{{ mngt.vlan }}
+
+# Routes
+{% for route in mngt.routes %}
+  post-up route add -net {{ route }}  gw {{ mngt.gtw }} dev vlan{{ mngt.vlan }}
+{% endfor %}

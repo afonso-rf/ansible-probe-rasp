@@ -4,8 +4,15 @@
   become: yes
 
   vars:
-    - mgnt_vlan: ''
-    - packages: ['git', 'ppp', 'vlan', 'pppoeconf', zabbix-agent]
+    packages:
+      - git
+      - vlan
+      - ppp
+      - pppoeconf
+      - zabbix-agent
+
+  vars_files:
+    - variables.yml
     
   tasks:
   - name: Packages update
@@ -23,15 +30,18 @@
       name: 8021q
       state: present
 
+  - name: Copy vlan config file
+    ansible.builtin.template:
+      src: src/template-vlan.j2
+      dest: "/etc/network/interfaces.d/vlan{{ mngt.vlan }}"
+      owner: root
+      group: root
+      mode: '644'
+    when: mngt.vlan is defined and mngt.vlan != ''
+
   - name: Copy script to ipv6 pppoe default route
     ansible.builtin.copy:
       src: ./src/defaultroute_ipv6
       dest: /etc/ppp/ip-up.d/
       mode: '755'
   
-  - name: Copy vlan config file
-    ansible.builtin.copy:
-      src: "{{ mgnt_vlan }}"
-      dest: "/etc/network/interfaces.d/{{ mngt_vlan }}"
-      mode: '644'
-    when: mgnt_vlan is defined and mgnt_vlan != ''
