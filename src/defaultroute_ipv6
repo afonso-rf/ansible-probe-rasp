@@ -1,4 +1,4 @@
 #!/bin/sh -e
 #/etc/ppp/ip-up.d/defaultroute_ipv6
 
-route add -A inet6 default dev $PPP_IFACE
+ip -6 route add default dev $PPP_IFACE

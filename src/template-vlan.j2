@@ -5,9 +5,9 @@ auto vlan{{ mngt.vlan }}
   address {{ mngt.ip }}
   vlan-raw-device eth0
 
-  post-up route add {{ mngt.gtw }} dev vlan{{ mngt.vlan }}
+  post-up ip route add {{ mngt.gtw }}  dev  vlan{{ mngt.vlan }}
 
 # Routes
 {% for route in mngt.routes %}
-  post-up route add -net {{ route }}  gw {{ mngt.gtw }} dev vlan{{ mngt.vlan }}
+  post-up ip route add {{ route }}  via  {{ mngt.gtw }}  dev  vlan{{ mngt.vlan }}
 {% endfor %}

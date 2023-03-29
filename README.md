@@ -6,23 +6,23 @@ Será necessario criar o arquivo `inventory` para colocar o host a ser configura
 
 ### Exemplo para o arquivo de inventario
 
-```
+```bash
 touch inventory
 nano inventory
 ```
-```
+```bash
 [probe]
-probe-01   ansible_host='10.10.10.1
+probe-01   ansible_host='10.10.10.1'
 
 ```
 
 ### Exemplo para o arquivo de variaveis
 
-```
+```bash
 touch variables.yml
 nano variables.yml
 ```
-```
+```yml
 mngt:
   vlan: <vlan de gerencia>
   ip: '11.11.11.2/28'
@@ -47,7 +47,7 @@ mngt:
 
 Apos criar os aquivos, que tal testarmos se o Raspberry PI responde? 
 
-```
+```bash
 ansible probe -u pi -k -i inventory -m ping
 ```
 
@@ -55,7 +55,7 @@ ansible probe -u pi -k -i inventory -m ping
 
 Se depois de colocar o password apareceu parecido com a imagem acima, então podemos rora a playbook. Caso tenha do erro, verifice se o ip, usuario e a senha estão corretos. 
 
-```
+```bash
 ansible-playbook playbook.yml -u pi -k
 ```
 
