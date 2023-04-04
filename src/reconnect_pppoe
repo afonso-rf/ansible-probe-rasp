@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+# /var/local/reconnect_pppoe
+import re
+import subprocess 
+#from pprint import pprint as pp
+from time import sleep
+
+
+ip = subprocess.Popen(['ip', 'add', 'show'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf8')
+out, err = ip.communicate()
+out = out.split('\n')
+
+connected = False
+
+for line in out:
+  port = re.findall(r'ppp\d', line)
+  if port:
+    connected = True
+
+if not connected:
+#  pp('Conectando...')
+  subprocess.call(['poff', 'dsl-provider'])
+  sleep(2)
+  subprocess.call(['pon', 'dsl-provider'])
+#else:
+#  pp('OK')

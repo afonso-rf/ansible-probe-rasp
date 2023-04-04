@@ -10,6 +10,7 @@
       - ppp
       - pppoeconf
       - zabbix-agent
+      - python3
 
   vars_files:
     - variables.yml
@@ -44,4 +45,41 @@
       src: ./src/defaultroute_ipv6
       dest: /etc/ppp/ip-up.d/
       mode: '755'
+    
+  - name: Add username and password pppoe chap secrets
+    ansible.builtin.lineinfile:
+      path: /etc/ppp/chap-secrets
+      state: present
+      line: '"{{ pppoe.username }}" * "{{ pppoe.passwd }}"'
+    when: pppoe.username is defined and pppoe.username != ''
+
+  - name: Add username and password pppoe pap secrets
+    ansible.builtin.lineinfile:
+      path: /etc/ppp/pap-secrets
+      state: present
+      line: '"{{ pppoe.username }}" * "{{ pppoe.passwd }}"'
+    when: pppoe.username is defined and pppoe.username != ''
+
+  - name: Copy vlan config file
+    ansible.builtin.template:
+      src: src/template.dsl-provider.j2
+      dest: "/etc/ppp/peers/dsl-provider"
+      owner: root
+      group: root
+      mode: '644'
+    when: pppoe.username is defined and pppoe.username != ''
+    
+  - name: Copy script reconnect pppoe
+    ansible.builtin.copy:
+      src: ./src/reconnect_pppoe
+      dest: /var/local/
+      mode: '755'
+    when: pppoe.username is defined and pppoe.username != ''
+  
+  - name: Add reconnect_pppoe in crontab
+    ansible.builtin.cron:
+      name: reconnect_pppoe
+      minute: "*/1"
+      job: "/usr/bin/python3 /var/local/reconnect_pppoe"
+    when: pppoe.username is defined and pppoe.username != ''
   

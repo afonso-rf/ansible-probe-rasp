@@ -1,9 +1,10 @@
 # Playbook para configuração de vlan de gerencia e pppoe no Raspberry PI
+---
 
 Playbook criado com o intuito de configurar um Raspberry PI para realizar uma conexão PPPoE para testes de ping, latêcia, etc... e com **zabbix-agent** no package. 
 
 Será necessario criar o arquivo `inventory` para colocar o host a ser configurado e o arquivo `variables.yml` para a declaração das variaveis necessarias. 
-
+&nbsp;
 ### Exemplo para o arquivo de inventario
 
 ```bash
@@ -13,9 +14,8 @@ nano inventory
 ```bash
 [probe]
 probe-01   ansible_host='10.10.10.1'
-
 ```
-
+&nbsp;
 ### Exemplo para o arquivo de variaveis
 
 ```bash
@@ -33,17 +33,23 @@ mngt:
     - '11.11.0.0/16'
     - '192.168.100.0/24'
 
+pppoe:
+  username: '<Nome do usuario>'
+  passwd: '<Senha do usuario>'
 ```
 
 #### Variaveis
 
-| Nome          | Descrição                        | Tipo    |
-| ------------- | -------------------------------- | ------- |
-| `mngt.vlan`   | Vlan de gerencia                 | int     |
-| `mngt.ip`     | Ip de gerencia / mascara         | IP/CIDR |
-| `mngt.gtw`    | Gateway de gerencia              | IP      |
-| `mngt.routes` | IP/CIDR para as adições de rotas | IP/CIDR |
+| Nome             | Descrição                             | Tipo    |
+| ---------------- | ------------------------------------- | ------- |
+| `mngt.vlan`      | Vlan de gerencia                      | int     |
+| `mngt.ip`        | Ip de gerencia / mascara              | IP/CIDR |
+| `mngt.gtw`       | Gateway de gerencia                   | IP      |
+| `mngt.routes`    | IP/CIDR para as adições de rotas      | IP/CIDR |
+| `pppoe.username` | Nome do usuario para a conexão pppoe  | string  |
+| `pppoe.passwd`   | Senha do usuario para a conexão pppoe | string  |
 
+&nbsp;
 
 Apos criar os aquivos, que tal testarmos se o Raspberry PI responde? 
 
@@ -61,4 +67,11 @@ ansible-playbook playbook.yml -u pi -k
 
 ![image](img/Screenshot_17.png)
 
-:construction: Ainda está em testes a adição das configurações do PPPoE  :construction:
+&nbsp;
+Depois de conlcuir, você recisará reiniciar o host. Então vamos fazer com o ansible. 
+
+```bash
+ansible vm_local -u pi -k -i inventory -m reboot -b
+```
+Foi adicionado a flag `-b`, pois o comando `reboot` precisa de privilégio sudo.
+
